@@ -1,7 +1,16 @@
 const express = require("express");
-const route = require("./routes/index.js");
+const mongoose = require("mongoose");
+const routeThing = require("./routes/thing.js");
+const routeProduct = require("./routes/product.js");
 
 const app = express();
+mongoose
+  .connect("mongodb://127.0.0.1:27017/", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Connect to db successfuly !"))
+  .catch((err) => console.error("Error connection to db", err));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -15,6 +24,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.use("/", route);
+app.use("/", routeThing);
+app.use("/", routeProduct);
 
 module.exports = app;
