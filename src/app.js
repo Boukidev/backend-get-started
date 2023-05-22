@@ -1,7 +1,14 @@
 const express = require("express");
-const route = require("./routes/index.js");
+const pool = require("./config/db.js");
+const routeEmployees = require("./routes/employeesRoute.js");
 
 const app = express();
+
+pool.connect((err, client, done) => {
+  if (err) console.error(err);
+  else console.log("Connexion to postgresql is done !");
+  done();
+});
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -15,6 +22,6 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.use("/", route);
+app.use("/", routeEmployees);
 
 module.exports = app;
