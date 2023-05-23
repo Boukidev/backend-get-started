@@ -1,5 +1,5 @@
 const express = require("express");
-const route = require("./routes/index.js");
+const routeSendmail = require("./routes/sendmail.js");
 
 const app = express();
 
@@ -15,6 +15,6 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.use("/", route);
+app.use("/", routeSendmail);
 
 module.exports = app;
