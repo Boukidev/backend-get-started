@@ -2,10 +2,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const routeThing = require("./routes/thing.js");
 const routeProduct = require("./routes/product.js");
+require("dotenv").config();
 
 const app = express();
 mongoose
-  .connect("mongodb://127.0.0.1:27017/", {
+  .connect(process.env.DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
