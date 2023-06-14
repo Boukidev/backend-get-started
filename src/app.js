@@ -1,18 +1,15 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const routeThing = require("./routes/thing.js");
-const routeProduct = require("./routes/product.js");
 require("dotenv").config();
+const express = require("express");
+const passport = require("passport");
+const mongoose = require("mongoose");
+
+const thingRoutes = require("./routes/thing.js");
+const userRoutes = require("./routes/user.js");
 
 const app = express();
-mongoose
-  .connect(process.env.DB_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("Connect to db successfuly !"))
-  .catch((err) => console.error("Error connection to db", err));
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(passport.initialize());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -23,9 +20,15 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
+mongoose
+  .connect(process.env.DB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Connect to db successfuly !"))
+  .catch((err) => console.error("Error connection to db", err));
 
-app.use("/", routeThing);
-app.use("/", routeProduct);
+app.use("/api/stuff", thingRoutes);
+app.use("/api/auth", userRoutes);
 
 module.exports = app;
