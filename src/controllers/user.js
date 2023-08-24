@@ -39,8 +39,7 @@ exports.login = async (req, res, next) => {
 
 exports.logout = async (req, res, next) => {
   try {
-    await res.setHeader("Authorization", "");
-    res.redirect("/");
+    res.status(200).json({ Message: "Logged out !" });
   } catch (error) {
     res.status(500).json({ Error: error });
     console.error({ Error: error });
