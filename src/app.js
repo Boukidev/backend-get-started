@@ -1,9 +1,9 @@
 require("dotenv").config();
+
 const express = require("express");
 const passport = require("passport");
 const mongoose = require("mongoose");
 
-const thingRoutes = require("./routes/thing.js");
 const userRoutes = require("./routes/user.js");
 
 const app = express();
@@ -28,7 +28,6 @@ mongoose
   .then(() => console.log("Connect to db successfuly !"))
   .catch((err) => console.error("Error connection to db", err));
 
-app.use("/api/stuff", thingRoutes);
 app.use("/api/auth", userRoutes);
 
 module.exports = app;
