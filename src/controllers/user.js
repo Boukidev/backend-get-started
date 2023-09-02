@@ -1,9 +1,12 @@
 require("dotenv").config();
+const jwtSecret = process.env.SECRET_JWT;
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+
 const User = require("../models/User.js");
 
-exports.signup = async (req, res, next) => {
+exports.signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
     const hash = await bcrypt.hash(password, 10);
@@ -17,31 +20,36 @@ exports.signup = async (req, res, next) => {
   }
 };
 
-exports.login = async (req, res, next) => {
+exports.login = async (req, res) => {
   try {
-    const { email } = req.body;
-    const user = await User.findOne({ email: email });
-
-    const payload = { userId: user._id };
-    const secretKey = process.env.SECRET_JWT;
-    const options = { expiresIn: "24h" };
-    const token = jwt.sign(payload, secretKey, options);
-
-    res
-      .status(200)
-      .setHeader("Authorization", "Bearer " + token)
-      .json({ token });
+    const token = jwt.sign({ userId: req.user._id }, jwtSecret, { expiresIn: "24h" });
+    res.status(200).json({ Token: token });
   } catch (error) {
     res.status(500).json({ Error: error });
-    console.error({ Error: error });
+    console.log({ Error: error });
   }
 };
 
-exports.logout = async (req, res, next) => {
-  try {
-    res.status(200).json({ Message: "Logged out !" });
-  } catch (error) {
-    res.status(500).json({ Error: error });
-    console.error({ Error: error });
-  }
-};
+// exports.updateProfile = async (req, res) => {
+//   try {
+//     const { username, email, firstName, lastName, dateBirth, bio, adress, profession } = req.body;
+//     await User.updateOne(
+//       { _id: req.params.id },
+//       {
+//         _id: req.params.id,
+//         username,
+//         email,
+//         firstName,
+//         lastName,
+//         dateBirth,
+//         bio,
+//         adress,
+//         profession,
+//       }
+//     );
+//     res.status(200).json({ message: "Profile updated !" });
+//   } catch (error) {
+//     res.status(500).json({ Error: error });
+//     console.log({ Error: error });
+//   }
+// };
