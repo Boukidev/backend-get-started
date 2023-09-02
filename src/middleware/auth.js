@@ -1,9 +1,11 @@
 require("dotenv").config();
+
+const bcrypt = require("bcrypt");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-const bcrypt = require("bcrypt");
+
 const User = require("../models/User.js");
 
 const jwtOptions = {
@@ -19,9 +21,8 @@ passport.use(
         return done(null, false, { message: "Invalid email or password" });
       }
 
-      const hash = await bcrypt.hash(password, 10);
-      const valid = await bcrypt.compare(password, hash);
-      if (!valid) {
+      const validPass = await bcrypt.compare(password, user.password);
+      if (!validPass) {
         return done(null, false, { message: "Invalid email or password" });
       }
 
@@ -39,6 +40,7 @@ passport.use(
       if (!user) {
         return done(null, false);
       }
+
       return done(null, user);
     } catch (error) {
       return done(error);
@@ -46,5 +48,17 @@ passport.use(
   })
 );
 
-exports.localAuthMiddleware = passport.authenticate("local", { session: false });
+exports.localAuthMiddleware = (req, res, next) => {
+  passport.authenticate("local", { session: false }, (err, user, info) => {
+    if (err || !user) {
+      return res.status(401).json({ Message: info.message });
+    }
+
+    req.login(user, { session: false }, (err) => {
+      if (err) return next(err);
+
+      next();
+    });
+  })(req, res, next);
+};
 exports.jwtAuthMiddleware = passport.authenticate("jwt", { session: false });
